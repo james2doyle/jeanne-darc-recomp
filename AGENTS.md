@@ -19,6 +19,11 @@ ctest --preset linux-x64-debug --output-on-failure
 
 Use `linux-x64-release` for `RelWithDebInfo`. Build one target with, for example, `cmake --build --preset linux-x64-debug --target jdarc_game_tests`.
 
+Configuring `linux-x64-release` needs two extras: `VULKAN_SDK` pointing at a Vulkan SDK with
+`slangc` (e.g. `VULKAN_SDK=~/.local/share/vulkansdk/1.4.363.1/x86_64 cmake --preset
+linux-x64-release`) and `-DCMAKE_DISABLE_FIND_PACKAGE_ZLIB-NG=TRUE` (otherwise minizip-ng's
+generate step fails on the missing `zlib-ng::zlibstatic` target).
+
 Builds can occasionally get stuck, so run them with a timeout rather than waiting indefinitely. On Linux, for example: `timeout 14m cmake --build --preset linux-x64-debug`; inspect the output before rerunning or adjusting the limit.
 
 Run only the game-format test executable with:
