@@ -1,0 +1,124 @@
+# Extra psprecomp function starts (hex, whitespace-separated, # comments): code addresses the static
+# analysis cannot see — callbacks stored to memory, runtime-built tables. Found by running headless and reading
+# "no function at 0xXXXXXXXX" / "call_guest: no function" lines, then confirming the address is code.
+# Regenerate with: psprecomp data/original/PSP_GAME/SYSDIR/BOOT.BIN data/generated --overrides src/decomp --seeds seeds.txt
+0889A998  # GE callback dispatcher (lw t9,4(a1); jr t9): registered via sceGeSetCallback through a stack struct
+08825B10  # GE-callback followup (verify)
+08825B38  # round 1
+0889250C  # callback stored in a table (called via jalr from 0x0882F614)
+088095B8  # callback thunk (j 0x0882AC0C), registered at 0x088095DC
+088095C0  # callback thunk (j 0x0882AC34), registered at 0x088095F0
+08825AFC  # malloc wrapper (heap 0x8A4BC8C, flags 1), used as a callback (called via jalr from 0x088145E8)
+08825B24  # malloc wrapper (flags 2)
+08825B4C  # free wrapper
+08825BBC  # alloc wrapper (heap 0x8A4BC48)
+08825BD0  # free wrapper (heap 0x8A4BC48)
+08825BE0  # realloc wrapper (heap 0x8A4BC48)
+08825BF8  # malloc wrapper (heap 0x8A4BCD0)
+08825C0C  # free wrapper (heap 0x8A4BCD0)
+# Function starts after a tail jump (j) that static analysis did not reach: these are only ever
+# entered through function pointers the game builds at run time (callbacks, allocator hooks).
+08805E04
+08805ED8
+08806134
+0880613C
+08806144
+0880614C
+0880984C
+08809A78
+08809A80
+08809B98
+08809BA8
+08809BB8
+0880C148
+0880F018
+0880FBBC
+0880FC00
+0880FE10
+0880FF30
+0880FF40
+08812B4C
+088135F0
+0881368C
+088158A8
+08815D04
+08817850
+088189F0
+0881917C
+088199F0
+0881AC40
+0881B138
+0881C7E8
+0883E6AC
+08844A54
+0884F80C
+08852E34
+08852F70
+088532C0
+08853428
+088535B8
+088537D4
+08853984
+08865800
+08866060
+088660B4
+0886610C
+0886633C
+088681B0
+088682FC
+088686CC
+08868D00
+08868FD8
+08868FF4
+08869010
+0886EE50
+0886EFB0
+0886F004
+0886F058
+0886F118
+0886F190
+08879F68
+0887BC3C
+0888FC88
+088934AC
+088936F4
+0889AC84
+0889AE24
+0889AE2C
+0889B118
+0889C0B4
+0889C830
+0889D454
+0889D69C
+0889D83C
+0889E144
+0889E978
+0889F26C
+0889F4F8
+0889F7C8
+088D5860
+088E3458
+088E650C
+088E6584
+088E6634
+088E6678
+088E67C4
+088E680C
+088F7FBC
+089005F4
+08902218
+08902318
+08902E28
+08903BB0
+08903EE8
+0890403C
+089044F4
+08905FE8
+0890667C
+089066B8
+089066D8
+08906780
+08906A90
+089083B0
+0890A5AC
+0890A780

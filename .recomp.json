@@ -1,0 +1,23 @@
+{
+  "$schema": "https://recomp.fyi/schema/v1.json",
+  "game": "Jeanne d'Arc",
+  "wikidata": "Q2459400",
+  "system": "PSP",
+  "type": "recomp",
+  "original": { "region": "USA", "revision": "1.00", "serial": "UCUS98700", "sha1": "87b0e5fdbadaa0741adf5a5007d25d51639e6f9e" },
+  "project": "Jeanne d'Arc Recomp",
+  "status": "exploring",
+  "targets": ["Windows", "Linux", "Android"],
+  "toolchain": "psprecore",
+  "approach": "Static recompilation of BOOT.BIN on the psprecore runtime (Vulkan/GE, ATRAC/PSMF via cooked media)",
+  "links": [
+    { "label": "psprecore (recompiler and runtime)", "url": "https://github.com/AdamFull/psprecore" },
+    { "label": "ff7ccrecomp (template project)", "url": "https://github.com/AdamFull/ff7ccrecomp" }
+  ],
+  "help": [
+    "PSP executable and module analysis (BOOT.BIN imports, JDB.PRX)",
+    "SPF container format documentation",
+    "First boot: tracing file reads and module loads"
+  ],
+  "notes": "Scaffold stage: project layout, build, and mod overlay are in place. BOOT.BIN is an unencrypted PRX (entry 0x088088e4, load base 0x08804000). No generated code yet: run psprecomp to create data/generated, then the jdarc target builds."
+}

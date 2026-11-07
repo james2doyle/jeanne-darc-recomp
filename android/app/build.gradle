@@ -1,0 +1,59 @@
+plugins {
+    id 'com.android.application'
+}
+
+def nativeBuild = file("${rootDir}/../build/${project.findProperty('nativePreset') ?: 'android-arm64-release'}")
+def sdlJava = file("${project.findProperty('sdlSource') ?: "${nativeBuild}/_deps/sdl3-src"}/android-project/app/src/main/java")
+
+android {
+    namespace = 'com.jdarcrecomp'
+    compileSdk = 36
+    ndkVersion = '29.0.14206865'  // used to strip debug info from libmain.so when packaging
+
+    defaultConfig {
+        applicationId = 'com.jdarcrecomp'
+        minSdk = 29     // Vulkan 1.1
+        targetSdk = 36
+        versionCode = 1
+        versionName = '0.1.0'
+        ndk { abiFilters 'arm64-v8a' }
+    }
+
+    sourceSets {
+        main {
+            java.srcDirs += [sdlJava]
+            jniLibs.srcDirs = ["${nativeBuild}/jniLibs"]
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled = false
+            signingConfig = signingConfigs.debug  // local builds only; nothing is published
+        }
+        profile {
+            initWith release
+            matchingFallbacks = ['release']
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    packaging {
+        // Extracted to nativeLibraryDir: libadrenotools loads its hook libraries from there (custom GPU drivers).
+        jniLibs { useLegacyPackaging = true }
+    }
+
+    lint { abortOnError = false }
+}
+
+tasks.register('checkNativeBuild') {
+    doLast {
+        if (!sdlJava.exists() || !file("${nativeBuild}/jniLibs/arm64-v8a/libmain.so").exists())
+            throw new GradleException("Build the native library first: scripts/build-android.ps1")
+    }
+}
+preBuild.dependsOn checkNativeBuild

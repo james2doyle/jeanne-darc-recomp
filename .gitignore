@@ -1,0 +1,65 @@
+# --- Copyrighted / third-party inputs: never commit ---
+# The user's own disc image and anything derived from it.
+*.iso
+*.cso
+*.pbp
+*.prx
+BOOT.BIN
+EBOOT.BIN
+PARAM.SFO
+*.at3
+*.pmf
+*.SPF
+*.spf
+*.GIM
+*.gim
+*.GMO
+*.gmo
+
+# --- The game copy and everything derived from it (data/: original, generated, cooked, recordings),
+# --- assets unpacked for editing (assets/), and the working directory for running the game (run/) ---
+/data/
+/assets/
+/run/
+
+# --- Build output ---
+/build/
+/out/
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.dll
+*.exe
+*.pdb
+*.apk
+*.aab
+
+# --- Tooling / editors ---
+__pycache__/
+*.pyc
+.venv/
+.vs/
+.vscode/
+.idea/
+*.user
+*.gpr
+*.rep/
+.DS_Store
+Thumbs.db
+
+# --- Android build output ---
+/android/.gradle/
+/android/build/
+/android/app/build/
+/android/local.properties
+
+# --- Local only ---
+/PORT_PLAN.md
+
+# --- Third-party tools downloaded for baking (tools-local/README) ---
+/tools-local/
+
+# Pinned third-party driver loader sources are vendored; their build output is not.
+shots
