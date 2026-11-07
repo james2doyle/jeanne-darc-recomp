@@ -48,8 +48,9 @@ What is known about this copy:
   (the load base the game is recompiled for).
 - `PSP_GAME/USRDIR/MODULE/JDB.PRX`: an unencrypted PRX the game loads (`Berkeley DB`, saves?);
   `LIBFONT.PRX`/`PSMF.PRX` are encrypted (`~SCE`) and will use the runtime's HLE instead.
-- `.SPF` files start with `SFP\0` (sound, maps...); `.PAC`, `.DAT`, `.GMO`/`.GIM`, `.PMF` movies,
-  ATRAC audio — formats still to document (PORT_PLAN.md, kept locally and never committed).
+- `.SPF` files start with `SFP\0` (sound, maps...); `.PAC`, `.DAT`, `.GMO`/`.GIM` formats still to
+  document (PORT_PLAN.md, kept locally and never committed). `.PMF` movies and ATRAC audio are
+  covered in [docs/formats.md](docs/formats.md) (cooked `movies/*.ivf` + `audio/*.ogg`).
 
 ## Requirements
 
