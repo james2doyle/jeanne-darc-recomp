@@ -1,26 +1,35 @@
 # --- Copyrighted / third-party inputs: never commit ---
 # The user's own disc image and anything derived from it.
-*.iso
-*.cso
-*.pbp
-*.prx
+# Case-insensitive: user-supplied rips come in any case.
+*.[iI][sS][oO]
+*.[cC][hH][dD]
+*.[cC][sS][oO]
+*.[pP][bB][pP]
+*.[pP][rR][xX]
 BOOT.BIN
 EBOOT.BIN
 PARAM.SFO
-*.at3
-*.pmf
-*.SPF
-*.spf
-*.GIM
-*.gim
-*.GMO
-*.gmo
+*.[aA][tT]3
+*.[pP][mM][fF]
+*.[sS][pP][fF]
+*.[gG][iI][mM]
+*.[gG][mM][oO]
 
 # --- The game copy and everything derived from it (data/: original, generated, cooked, recordings),
 # --- assets unpacked for editing (assets/), and the working directory for running the game (run/) ---
 /data/
 /assets/
 /run/
+
+# --- Local debugging artifacts (never commit) ---
+ge_dump.txt
+*.bin
+vulkan_pipelines.bin.keys
+*.zip
+
+# --- Logs & traces (HLE logs embed guest addresses) ---
+logs/
+*.trace
 
 # --- Build output ---
 /build/
