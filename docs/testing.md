@@ -19,4 +19,11 @@ A recording stores the guest clock it started with and snapshots the save folder
 - The game's state also matches between the PC and Android: `--state-hash N` on both gives the
   same hashes for the same recording.
 
+Android's `--smoke` checks that the game boots for 120 guest vblanks; it does not verify rendered
+pixels. For display changes, also inspect a movie centered at its original 480:272 aspect ratio,
+the `TITLE.GIM` screen, and a 3D scene with complete character silhouettes and HUD/dialog overlays.
+Check both the original aspect ratio and Fill the screen at a wider aspect ratio, using desktop as a
+convenient control before an on-device check. Replay completion, state hashes, and image comparisons
+support but do not replace manual visual QA of these cases.
+
 Recordings and references stay local (they derive from the game and your saves).
