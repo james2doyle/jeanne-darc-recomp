@@ -28,10 +28,11 @@ scripts that produced these notes live in `tools/analysis/` (throwaway, game-spe
   sub-rectangles through GE `BEZIER` patches (`TEXSCALE`/`TEXOFFSET` select logo, blinking
   `PRESS ANY BUTTON`, copyright), so a full-texture draw shows duplicate menus and debug text.
 - `.PMF` (`MOVIE/DEMO*.PMF`, `CI.PMF`): standard PSMF movies (H.264 480x272); the runtime's sceMpeg HLE plays them from
-  cooked media (`movies/<fnv1a64-of-2048-byte-header>.ivf` + `.ogg`). Without it the game shows black
-  (`sceMpeg: no cooked movie ... showing black`). Stopgap until `jdcook` exists (FFmpeg with SVT-AV1,
-  video only — audio stays silent):
-  `ffmpeg -i CI.PMF -an -c:v libsvtav1 -preset 8 -crf 32 -pix_fmt yuv420p -r 29.97 <key>.ivf`.
+  cooked media (`movies/<fnv1a64-of-2048-byte-header>.ivf` + `.ogg`). Missing tracks are reported as
+  `sceMpeg: no cooked movie ... showing black` or `sceMpeg: no cooked audio ... silent`. `jdcook` demuxes
+  the H.264 and private-stream ATRAC3plus itself (FFmpeg does not detect the latter in these PMF files),
+  then converts them with SVT-AV1 and Vorbis:
+  `build/linux-x64-debug/tools/jdcook/jdcook data/original data/cooked`.
   The player covers the game's direct-sceMpeg path including the YCbCr/Csc presentation used for
   cutscenes (`AvcInitYCbCr`/`AvcDecodeYCbCr`/`AvcDecodeStopYCbCr(mpeg, buffer, status*)`/`AvcCsc`,
   `QueryStreamSize`, `scePsmfSetPsmf/GetVideoInfo` — PPSSPP-faithful signatures; the Stop form takes no
@@ -40,9 +41,9 @@ scripts that produced these notes live in `tools/analysis/` (throwaway, game-spe
   boot ident's audio) is ignored after ~2 s so it cannot pin the buffer and stall feeding. End of movie
   is detected by bytes fed vs the header's stream size; drained readers then get PPSSPP-style
   `dts=-1` + `NO_DATA`.
-- Audio inside `.SPF` / `.SKL`: ATRAC3/ATRAC3plus RIFF files; cooked to
-  `audio/<fnv1a64-of-riff-header-plus-data>.ogg`. `jdcook` (not written yet) will do both conversions
-  with FFmpeg; until then `cccook` from the Crisis Core project is the reference implementation.
+- Non-movie audio is still being documented; `jdcook` currently handles only PSMF movies. FFmpeg's
+  ATRAC3plus decoder repeats input timestamps, so movie Ogg timestamps are regenerated with
+  `asetpts=N/SR/TB`.
 
 ## Text
 

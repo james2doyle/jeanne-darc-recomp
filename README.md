@@ -11,7 +11,7 @@ built by static recompilation and progressive decompilation.
 ```
 src/            the game's own code (main, mods) and hand-written replacements (src/decomp)
 libs/           the game's file formats (currently: SPF container check)
-tools/          game-specific tools (analysis scripts; a jdcook media baker comes later)
+tools/          game-specific tools (jdcook media baker, analysis scripts)
 tests/ docs/ scripts/ android/
 psprecore/      the recompiler and runtime (submodule)
 data/           your game copy and everything derived from it (git-ignored):
@@ -81,7 +81,7 @@ scripts\build.ps1                     # windows-x64-debug: configure, build, run
 ```
 
 The `jdarc` game target appears only after code is generated (see below); before that, the build still
-produces `psprecomp`, `psprx`, `psptex` and the format/tests targets.
+produces `jdcook`, `psprecomp`, `psprx`, `psptex` and the format/tests targets.
 
 ## Getting started
 
@@ -106,12 +106,13 @@ Recompile it to C (output goes to the git-ignored `data/generated/` and is picke
 psprecomp data/original/PSP_GAME/SYSDIR/BOOT.BIN data/generated --overrides src/decomp --seeds seeds.txt
 ```
 
-Cook the media the game loads besides the disc (ATRAC audio, PSMF movies become Ogg/IVF; needs the
-FFmpeg command-line tool). Without it, music plays as silence and movies stay black. `jdcook` is not
-written yet; until then `cccook` from the Crisis Core project is the reference implementation:
+Cook the movie media the game loads besides the disc (PSMF video becomes AV1/IVF and its ATRAC3plus audio
+becomes Ogg). This needs FFmpeg with the SVT-AV1 and Vorbis encoders. Missing audio is silent and missing
+video is black. Existing outputs are kept, so an interrupted cooking run can be resumed:
 
 ```
-# jdcook data/original data/cooked   (planned; see docs/formats.md)
+cmake --build --preset linux-x64-debug --target jdcook
+build/linux-x64-debug/tools/jdcook/jdcook data/original data/cooked
 ```
 
 Run the game:
