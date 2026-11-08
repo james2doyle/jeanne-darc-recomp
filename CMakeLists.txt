@@ -23,6 +23,8 @@ if(PSPRECORE_BUILD_TESTS)
 endif()
 
 if(PSPRECORE_BUILD_TOOLS)
+    add_subdirectory(tools/jdcook)
+
     # Edited textures (assets/textures, laid out by a future unpack tool) are packed into the cooked media by every
     # build (psptex pack compares the pictures' pixels with the originals, so it is quick). assets/textures-hd
     # (psptex match, e.g. from another project's texture pack) fills in where a picture in assets/textures is
