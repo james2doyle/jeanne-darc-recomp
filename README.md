@@ -21,10 +21,26 @@ HLE. Media and code details live in [docs/formats.md](docs/formats.md) and
   `sha1sum game.iso` should print `87b0e5fdbadaa0741adf5a5007d25d51639e6f9e`.
 - CMake ≥ 3.25, Ninja, LLVM/Clang (and the Vulkan SDK, slangc). On Windows, also Visual Studio 2022
   (for the Windows SDK and CRT used by `clang-cl`).
+- FFmpeg with the SVT-AV1 and Vorbis encoders (movie cooking is a required build step).
 
 ## Building
 
-First checkout: `git submodule update --init --recursive`. Then use the wrapper scripts:
+First checkout: `git submodule update --init --recursive`. Then follow these steps in order:
+
+1. Extract your disc once (the game runs from the folder, never from the ISO):
+
+```
+7z x game.iso -odata/original PSP_GAME UMD_DATA.BIN
+```
+
+2. Recompile it to C (output goes to the git-ignored `data/generated/` and is picked up by the build;
+see [docs/decompilation.md](docs/decompilation.md)):
+
+```
+build/linux-x64-debug/psprecore/tools/psprecomp/psprecomp data/original/PSP_GAME/SYSDIR/BOOT.BIN data/generated --overrides src/decomp --seeds seeds.txt
+```
+
+3. Build with the wrapper scripts:
 
 ```
 scripts/build.sh                              # Linux: linux-x64-debug, build + tests
@@ -33,26 +49,11 @@ scripts/build.sh --preset linux-x64-debug --target jdarc   # single target
 scripts\build.ps1 -Preset windows-x64-release -NoTest   # Windows (sets up the VS environment itself)
 ```
 
-The `jdarc` game target appears only after code is generated (see below); before that, the build still
+The `jdarc` game target appears only after step 2; before that, the build still
 produces `jdcook`, `psprecomp`, `psprx`, `psptex` and the format/tests targets.
 
-## Getting started
-
-Extract your disc once (the game runs from the folder, never from the ISO):
-
-```
-7z x game.iso -odata/original PSP_GAME UMD_DATA.BIN
-```
-
-Recompile it to C (output goes to the git-ignored `data/generated/` and is picked up by the build;
-see [docs/decompilation.md](docs/decompilation.md)):
-
-```
-build/linux-x64-debug/psprecore/tools/psprecomp/psprecomp data/original/PSP_GAME/SYSDIR/BOOT.BIN data/generated --overrides src/decomp --seeds seeds.txt
-```
-
-Cook the movie media the game loads besides the disc (PSMF video becomes AV1/IVF and its ATRAC3plus audio
-becomes Ogg). This needs FFmpeg with the SVT-AV1 and Vorbis encoders:
+4. Cook the movie media the game loads besides the disc (required — without it movies play
+black and silent). PSMF video becomes AV1/IVF and its ATRAC3plus audio becomes Ogg:
 
 ```
 scripts/cook.sh                              # data/original -> data/cooked
@@ -60,7 +61,7 @@ scripts/cook.sh -- --force --limit 1         # re-cook, or trial-run the first m
 scripts\cook.ps1                             # Windows
 ```
 
-Run the game (settings, saves: the working directory):
+5. Run the game (settings, saves: the working directory):
 
 ```
 scripts/run.sh                              # the repository's layout (run/ as cwd)
