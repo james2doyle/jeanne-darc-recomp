@@ -23,7 +23,8 @@
 # -ResetAppData repairs that by uninstalling the app first, which DELETES its files folder including saves (it needs
 # -Install to put the app back).
 #
-# Needs: Android SDK (ANDROID_HOME) with NDK 29.0.14206865, JDK 17+, the Vulkan SDK (VULKAN_SDK: slangc, volk, VMA),
+# Needs: Android SDK (ANDROID_HOME) with NDK 29.0.14206865, JDK 17 or 21 (auto-selected;
+# JDK 22+ breaks AGP's androidJdkImage transform), the Vulkan SDK (VULKAN_SDK: slangc, volk, VMA),
 # and data\generated from psprecomp. CMake/Ninja are taken from Visual Studio when not on PATH.
 param(
     [switch]$Install,
@@ -186,6 +187,57 @@ if (-not (Get-Command cmake -ErrorAction SilentlyContinue)) {
     $env:PATH = "$vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin;$vs\Common7\IDE\CommonExtensions\Microsoft\CMake\Ninja;$env:PATH"
 }
 
+# Android takes volk and VMA (and matching headers) from the host Vulkan SDK; the NDK does not ship them.
+# Located automatically (an explicit VULKAN_SDK wins); override with $env:VULKAN_SDK.
+$candidates = @($env:VULKAN_SDK) + @(Get-ChildItem 'C:\VulkanSDK' -Directory -ErrorAction SilentlyContinue |
+    ForEach-Object FullName) + @("$env:ProgramFiles\VulkanSDK")
+$sdkRoot = $null
+foreach ($c in $candidates) {
+    if (-not $c) { continue }
+    foreach ($inc in @("$c\Include", "$c\include")) {
+        if ((Test-Path (Join-Path $inc 'Volk\volk.c')) -and (Test-Path (Join-Path $inc 'vma'))) {
+            $sdkRoot = $c; break
+        }
+    }
+    if ($sdkRoot) { break }
+    if ($c -ceq $env:VULKAN_SDK) { Write-Warning "VULKAN_SDK=$c has no Volk\volk.c + vma\; looking elsewhere" }
+}
+if (-not $sdkRoot) { throw 'No Vulkan SDK with Volk\volk.c and vma\ found; install the LunarG SDK or set VULKAN_SDK' }
+if (-not $env:VULKAN_SDK) { Write-Host "Using Vulkan SDK: $sdkRoot" }
+$env:VULKAN_SDK = $sdkRoot
+
+# AGP's androidJdkImage transform (core-for-system-modules.jar via jlink) only runs on JDK 17/21;
+# a newer default JDK fails compileReleaseJavaWithJavac. Prefer an explicit JAVA_HOME when suitable,
+# otherwise auto-select 17, then 21.
+function Get-JdkMajor([string]$home) {
+    $out = & (Join-Path $home 'bin\java.exe') -version 2>&1 | Select-Object -First 1
+    if ($out -match 'version "(\d+)') { return [int]$Matches[1] }
+    return $null
+}
+function Find-AndroidJdk {
+    if ($env:JAVA_HOME -and (Test-Path (Join-Path $env:JAVA_HOME 'bin\javac.exe'))) {
+        $ver = Get-JdkMajor $env:JAVA_HOME
+        if ($ver -eq 17 -or $ver -eq 21) { return $env:JAVA_HOME }
+        Write-Warning "JAVA_HOME=$env:JAVA_HOME is JDK $ver; need 17 or 21, looking elsewhere"
+    }
+    $candidates = @(
+        "$env:ProgramFiles\Android\Android Studio\jbr",
+        "$env:LOCALAPPDATA\Programs\Android Studio\jbr",
+        (Get-ChildItem 'C:\Program Files\Java\jdk-17*' -Directory -ErrorAction SilentlyContinue | ForEach-Object FullName),
+        (Get-ChildItem 'C:\Program Files\Eclipse Adoptium\jdk-17*' -Directory -ErrorAction SilentlyContinue | ForEach-Object FullName),
+        (Get-ChildItem 'C:\Program Files\Microsoft\jdk-17*' -Directory -ErrorAction SilentlyContinue | ForEach-Object FullName),
+        (Get-ChildItem 'C:\Program Files\Java\jdk-21*' -Directory -ErrorAction SilentlyContinue | ForEach-Object FullName),
+        (Get-ChildItem 'C:\Program Files\Eclipse Adoptium\jdk-21*' -Directory -ErrorAction SilentlyContinue | ForEach-Object FullName),
+        (Get-ChildItem 'C:\Program Files\Microsoft\jdk-21*' -Directory -ErrorAction SilentlyContinue | ForEach-Object FullName)
+    ) | Where-Object { $_ -and (Test-Path (Join-Path $_ 'bin\javac.exe')) }
+    foreach ($wanted in 17, 21) {
+        foreach ($c in $candidates) {
+            if ((Get-JdkMajor $c) -eq $wanted) { return $c }
+        }
+    }
+    return $null
+}
+
 # A profile preset's first configure takes the third-party sources its release preset fetched (no second download).
 function Get-ReusedSources([string]$preset) {
     if ($preset -notlike '*-profile') { return @() }
@@ -220,13 +272,19 @@ try {
 
         Push-Location (Join-Path $root 'android')
         try {
+            $jdk = Find-AndroidJdk
+            if (-not $jdk) { throw 'No JDK 17 or 21 found (need one for AGP; JDK 22+ fails the androidJdkImage transform). Set JAVA_HOME.' }
+            $env:JAVA_HOME = $jdk
+            $env:PATH = "$jdk\bin;$env:PATH"
+            Write-Host "Using JDK: $jdk ($(Get-JdkMajor $jdk))"
+            $jdkHome = "-Dorg.gradle.java.home=$jdk"
             if ($Profile) {
                 # SDL's Java sources: in the profile build tree, or the release one's it reused.
                 $sdl = Join-Path $native '_deps\sdl3-src'
                 if (-not (Test-Path $sdl)) { $sdl = Join-Path $root 'build\android-arm64-release\_deps\sdl3-src' }
-                .\gradlew.bat assembleProfile "-PnativePreset=$preset" "-PsdlSource=$sdl" --console=plain
+                .\gradlew.bat assembleProfile "-PnativePreset=$preset" "-PsdlSource=$sdl" $jdkHome --console=plain
             }
-            else { .\gradlew.bat assembleRelease --console=plain }
+            else { .\gradlew.bat assembleRelease $jdkHome --console=plain }
             if ($LASTEXITCODE) { throw 'Gradle build failed' }
         } finally { Pop-Location }
         Write-Host "APK: $apk"
