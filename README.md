@@ -34,10 +34,13 @@ First checkout: `git submodule update --init --recursive`. Then follow these ste
 ```
 
 2. Recompile it to C (output goes to the git-ignored `data/generated/` and is picked up by the build;
-see [docs/decompilation.md](docs/decompilation.md)):
+see [docs/decompilation.md](docs/decompilation.md)). The script finds or builds a host `psprecomp`
+(it runs on the host even when the game targets Android, whose presets build no host tools):
 
 ```
-build/linux-x64-debug/psprecore/tools/psprecomp/psprecomp data/original/PSP_GAME/SYSDIR/BOOT.BIN data/generated --overrides src/decomp --seeds seeds.txt
+scripts/recompile.sh                         # auto-detect preset
+scripts/recompile.sh --preset linux-x64-release
+scripts\recompile.ps1                        # Windows
 ```
 
 3. Build with the wrapper scripts:

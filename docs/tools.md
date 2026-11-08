@@ -18,12 +18,12 @@ psprx symbols BOOT.BIN data/nids.tsv build/symbols.tsv 0x08804000 build/ghidra_s
 
 ## psprecomp: translating it to C
 
-`psprecomp` translates BOOT.BIN into C (see
-[psprecore/docs/recompiler.md](../psprecore/docs/recompiler.md)):
-
-```
-psprecomp data/original/PSP_GAME/SYSDIR/BOOT.BIN data/generated --overrides src/decomp --seeds seeds.txt
-```
+`scripts/recompile.sh` translates BOOT.BIN into C (see
+[psprecore/docs/recompiler.md](../psprecore/docs/recompiler.md)): it finds or builds a host
+`psprecomp` and runs
+`psprecomp data/original/PSP_GAME/SYSDIR/BOOT.BIN data/generated --overrides src/decomp --seeds seeds.txt`.
+Android presets build no host tools, so recompilation always uses a host preset even when the
+game itself targets a device.
 
 Game functions can be replaced by hand-written C++ in `src/decomp/` (`GAME_FUNC`); see
 [docs/decompilation.md](decompilation.md).
