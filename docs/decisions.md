@@ -3,6 +3,27 @@
 Lightweight log of direction calls that would otherwise live only in chat history.
 Newest first.
 
+## 003 — Pin psprecore to our fork (2026-11-08)
+
+**Context.** The runtime fixes this project needs live in psprecore PRs
+#1–#4 against AdamFull/psprecore (terminate unwind, media HLE, BEZIER
+tessellation, fill-screen rendering) — all open, none merged.
+
+**Alternatives considered.**
+- *Pin upstream, patch locally.* Rejected: a pinned commit must exist
+  where the submodule URL points, or fresh clones fail to check out.
+- *Wait for upstream to merge.* Rejected: blocks the public repo and
+  every new checkout on someone else's review queue.
+
+**Decision.** The submodule points at james2doyle/psprecore, whose master
+is upstream plus our fixes. Upstream stays the target: the PRs remain open
+and the pin moves back if they merge.
+
+**Consequences.**
+- `git submodule update --init --recursive` works on a fresh clone.
+- Keep fork master a fast-forward superset of upstream until the PRs
+  land; no unrelated work on it.
+
 ## 002 — Substitute host font for dialog text (2026-11-08)
 
 **Context.** Dialog needs glyphs, but the disc has no usable font data:
