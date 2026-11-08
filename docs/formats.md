@@ -27,6 +27,10 @@ scripts that produced these notes live in `tools/analysis/` (throwaway, game-spe
   menu texts and a `[ Debug ]` column in one texture. The game never draws it whole: it samples
   sub-rectangles through GE `BEZIER` patches (`TEXSCALE`/`TEXOFFSET` select logo, blinking
   `PRESS ANY BUTTON`, copyright), so a full-texture draw shows duplicate menus and debug text.
+- Textures are edited by hand in `assets/textures` (unpacked layout still to be defined for this game's
+  formats), and the build packs the edited ones into `data/cooked/textures`, which the game draws instead
+  of the originals (the "HD textures" setting switches them off and on). `psptex` does the packing and
+  matching; see the Crisis Core project's docs for the workflow until this game's unpack tool exists.
 - `.PMF` (`MOVIE/DEMO*.PMF`, `CI.PMF`): standard PSMF movies (H.264 480x272); the runtime's sceMpeg HLE plays them from
   cooked media (`movies/<fnv1a64-of-2048-byte-header>.ivf` + `.ogg`). Missing tracks are reported as
   `sceMpeg: no cooked movie ... showing black` or `sceMpeg: no cooked audio ... silent`. `jdcook` demuxes

@@ -33,6 +33,16 @@ GAME_FUNC(08998F70, game_memcpy) {
 - Calling game code: `call(ctx, f_XXXXXXXX, args...)` or `call_address(ctx, addr, args...)` for function
   pointers the game holds; both return v0.
 
+## Inspecting the executable
+
+`psprx` names the imported system functions (needs `data/nids.tsv`; see [docs/tools.md](tools.md)):
+
+```
+psprx info    data/original/PSP_GAME/SYSDIR/BOOT.BIN
+psprx imports data/original/PSP_GAME/SYSDIR/BOOT.BIN data/nids.tsv
+psprx disasm  data/original/PSP_GAME/SYSDIR/BOOT.BIN
+```
+
 ## Regenerating
 
 The generator has to know which functions are replaced, so that it renames them to `f_XXXXXXXX_orig`:
