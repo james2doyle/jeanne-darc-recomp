@@ -3,7 +3,7 @@
 # set. Next to regress.ps1 (the game's RAM): the pictures, for changes that must not alter what is drawn. Pictures
 # and recordings stay local (they show the game).
 #
-# The runs below are placeholders (vblanks picked during first boot): update them once recordings exist.
+# The runs below are placeholders (vblanks picked during first boot): update them with your own recordings (see docs/testing.md).
 #
 #   scripts\pictures.ps1 -Out build\pictures-ref                            # write a reference set
 #   scripts\pictures.ps1 -Out build\pictures-new -Reference build\pictures-ref   # write and compare

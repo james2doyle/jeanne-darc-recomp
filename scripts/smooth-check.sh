@@ -3,7 +3,7 @@
 # the draws it flags: matched 3D draws drawn apart from a part of a model next to them that moved as they did.
 # Fails when any are flagged. Logs stay in --out (they name vblanks to look at with --window-shot).
 #
-# The runs below are placeholders (vblanks picked during first boot): update them once recordings exist.
+# The runs below are placeholders (vblanks picked during first boot): update them with your own recordings (see docs/testing.md).
 #
 #   scripts/smooth-check.sh
 #   scripts/smooth-check.sh --runs boot

@@ -4,7 +4,7 @@ A native PC (Windows/Linux) and Android port of the PSP game *Jeanne d'Arc*,
 built by static recompilation and progressive decompilation.
 
 **This repository contains no game code or assets.** You need your own copy of the game
-(UCUS-98700, USA). Everything derived from it is generated locally and never committed.
+(UCUS98700, USA). Everything derived from it is generated locally and never committed.
 
 ## Layout
 
@@ -31,7 +31,8 @@ archive tool: mods overlay whole files, and later mod folders win.
 ## Status
 
 Boots through the opening movie to the title screen, and NEW GAME reaches the `DEMO0000`
-cutscene. Media and code details live in [docs/formats.md](docs/formats.md) and
+cutscene and the village dialog beyond it, with text rendered by the substitute-font
+HLE. Media and code details live in [docs/formats.md](docs/formats.md) and
 [docs/decompilation.md](docs/decompilation.md).
 
 ## Requirements

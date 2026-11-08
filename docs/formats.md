@@ -16,7 +16,7 @@ scripts that produced these notes live in `tools/analysis/` (throwaway, game-spe
 ## Containers
 
 - `.SPF` (`SFP\0` magic, ~2.5k files): sound (`SOUND/SKL*.SPF`, `SYS.SPF`), maps (`WMAP.SPF`,
-  `MAP/MAP*.SPF`). Header has a count at `u32@8`; entry table layout still open (Phase 2).
+  `MAP/MAP*.SPF`). Header has a count at `u32@8`; the entry table layout is not yet documented.
 - `.PAC` (`LOGIC.PAC`, skill packs): starts with zeros; format still open.
 - `.DAT` (maps, `BASEMAP.DAT`, `MAPINFO.DAT`): raw tables; format still open.
 

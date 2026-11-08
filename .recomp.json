@@ -6,7 +6,7 @@
   "type": "recomp",
   "original": { "region": "USA", "revision": "1.00", "serial": "UCUS98700", "sha1": "87b0e5fdbadaa0741adf5a5007d25d51639e6f9e" },
   "project": "Jeanne d'Arc Recomp",
-  "status": "exploring",
+  "status": "in-progress",
   "targets": ["Windows", "Linux", "Android"],
   "toolchain": "psprecore",
   "approach": "Static recompilation of BOOT.BIN on the psprecore runtime (Vulkan/GE, ATRAC/PSMF via cooked media)",
@@ -15,9 +15,8 @@
     { "label": "ff7ccrecomp (template project)", "url": "https://github.com/AdamFull/ff7ccrecomp" }
   ],
   "help": [
-    "PSP executable and module analysis (BOOT.BIN imports, JDB.PRX)",
-    "SPF container format documentation",
-    "First boot: tracing file reads and module loads"
+    "SPF container entry table layout (tools/analysis notes in docs/formats.md)",
+    "Font HLE: full 26.6 ascender/descender values fault the boot text converter"
   ],
-  "notes": "Scaffold stage: project layout, build, and mod overlay are in place. BOOT.BIN is an unencrypted PRX (entry 0x088088e4, load base 0x08804000). No generated code yet: run psprecomp to create data/generated, then the jdarc target builds."
+  "notes": "Boots through the opening movie to the title screen; NEW GAME reaches the DEMO0000 cutscene and the village dialog with rendered text (substitute host font). Movies play from cooked AV1/IVF + Ogg. Next: map/system text paths beyond dialog, SPF containers, model/animation formats."
 }
