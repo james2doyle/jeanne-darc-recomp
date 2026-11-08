@@ -1,14 +1,12 @@
 # JDARCRECOMP
 
+![jd-banner.jpg](jd-banner.jpg)
+
 A native PC (Windows/Linux) and Android port of the PSP game *Jeanne d'Arc*,
 built by static recompilation and progressive decompilation.
 
 **This repository contains no game code or assets.** You need your own copy of the game
 (UCUS98700, USA). Everything derived from it is generated locally and never committed.
-
-The recompiler and runtime are [psprecore](https://github.com/james2doyle/psprecore), a git submodule.
-Jeanne d'Arc keeps loose files on the disc (per-stage `DATA/AS*/` folders), so there is no
-archive tool: mods overlay whole files, and later mod folders win.
 
 ## Status
 
