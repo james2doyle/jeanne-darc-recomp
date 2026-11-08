@@ -1,4 +1,4 @@
-// SPF container magic check (docs/formats.md). Table layout tests come with Phase 2.
+// SPF container magic check (docs/formats.md). Table layout tests once the entry table is documented.
 #include "jdarc/formats/spf.hpp"
 
 #include <span>
