@@ -51,5 +51,25 @@ scripts that produced these notes live in `tools/analysis/` (throwaway, game-spe
 
 ## Text
 
-Font/text layout still open (Phase 4). `LIBFONT.PRX` is encrypted, so text rendering goes through the
-runtime's font HLE or a `GAME_FUNC` replacement once the game's font tables are found.
+Dialog text renders through the runtime's substitute-font HLE
+(`psprecore/runtime/src/hle_font.cpp`): the disc carries no system fonts
+(`LIBFONT.PRX` is encrypted), so glyphs come from a host TrueType face
+(`PSPRECORE_FONT`, else a system DejaVu/Arial/Roboto/Noto) rasterized with
+stb_truetype. Verified with `data/recordings/fonts.txt` at vblank 3200
+("Two pretty girls like you", name tag "jacques").
+
+ABI notes (all verified against PPSSPP's PGF implementation and header):
+- `GetCharInfo` reports PGFCharInfo with 26.6 advances (`advance<<6`);
+  control chars (<0x20) return blank + zero advance (real PGF zeroes
+  info for `charCode < firstGlyph`).
+- `GetCharGlyphImage_Clip` rasterizes in place into the game's buffer
+  (saturating add, clipped, 4bpp/8bpp only); the x fraction of `xPos64`
+  blends, the y fraction is discarded. The game builds a glyph-cache
+  texture at boot (cells at 20px stride) and draws dialog as textured
+  quads, so no per-dialog Clip calls occur.
+- The game never queries 0x20 (space, confirmed in both our log and
+  PPSSPP's): word gaps derive from `GetFontInfo` maxSize, which must be
+  real PGF values (ltn5.pgf, the serif-bold Latin font the game opens:
+  1509x1210 in 26.6). ascender/descender stay at host-pixel scale — the
+  full 26.6 header values (863/-196) fault the boot text converter
+  (root cause open).

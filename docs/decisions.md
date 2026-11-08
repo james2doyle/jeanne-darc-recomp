@@ -3,6 +3,39 @@
 Lightweight log of direction calls that would otherwise live only in chat history.
 Newest first.
 
+## 002 — Substitute host font for dialog text (2026-11-08)
+
+**Context.** Dialog needs glyphs, but the disc has no usable font data:
+`LIBFONT.PRX` is encrypted and the PSP system fonts live in flash, not on
+the UMD. PPSSPP and MHForever solve this with real PGF parsing, Yakumo with
+a substitute-font HLE.
+
+**Alternatives considered.**
+- *Ship a real PGF* (extract Sony's ltn5.pgf). Rejected: no license to
+  redistribute console firmware files.
+- *Port PPSSPP/MHForever font code.* Rejected: GPL-licensed, unusable under
+  this project's MIT terms.
+- *`GAME_FUNC` decomp patch for layout.* Rejected as the fix: the missing
+  piece is glyph data, not layout — the game's cache/pen logic is correct
+  once metrics are sane (word-touching traced to fake `maxSize`, not code).
+- *Yakumo-style substitute HLE* (clean-room metrics + host-face raster).
+  Chosen: no encumbered data or code, and PPSSPP's PGF source/docs serve as
+  a behavioral reference without copying implementation.
+
+**Decision.** Serve libfont from a host TrueType face (stb_truetype):
+26.6 CharInfo advances, blank+zero for control chars, in-place Clip
+rasterization, and real-ltn5 `maxSize` so word gaps lay out. Host face via
+`PSPRECORE_FONT`, else system-font fallback; without one, text stays blank
+but layout proceeds.
+
+**Consequences.**
+- Dialog renders without any Sony font file or GPL code in tree.
+- `ascender/descender` stay at host-pixel scale: full 26.6 header values
+  fault the boot text converter (open root cause; don't "fix" by reverting
+  `maxSize` — that re-collapses spaces).
+- The game never queries 0x20, so no HLE value can add spaces by itself;
+  spacing lives or dies in `GetFontInfo` (verified against PPSSPP logs).
+
 ## 001 — Keep cooked movies (2026-11-08)
 
 **Context.** Movies are PSMF (H.264 + ATRAC3plus in 2048-byte packs). Playback today
