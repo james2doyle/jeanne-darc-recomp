@@ -6,25 +6,7 @@ built by static recompilation and progressive decompilation.
 **This repository contains no game code or assets.** You need your own copy of the game
 (UCUS98700, USA). Everything derived from it is generated locally and never committed.
 
-## Layout
-
-```
-src/            the game's own code (main, mods) and hand-written replacements (src/decomp)
-libs/           the game's file formats
-tools/          game-specific tools (jdcook media baker, analysis scripts)
-tests/ docs/ scripts/ android/
-psprecore/      the recompiler and runtime (submodule)
-data/           your game copy and everything derived from it (git-ignored):
-  original/       the disc folder (PSP_GAME/...) extracted from your own game.iso
-  generated/      C code recompiled from BOOT.BIN (psprecomp)
-  cooked/         what the game loads besides the disc: audio, movies, textures
-  recordings/     play sessions for replays and regression tests
-assets/         game assets unpacked for editing (git-ignored)
-run/            the working directory for playing: settings, saves, mods (git-ignored)
-build/          CMake output
-```
-
-The recompiler and runtime are [psprecore](https://github.com/AdamFull/psprecore), a git submodule.
+The recompiler and runtime are [psprecore](https://github.com/james2doyle/psprecore), a git submodule.
 Jeanne d'Arc keeps loose files on the disc (per-stage `DATA/AS*/` folders), so there is no
 archive tool: mods overlay whole files, and later mod folders win.
 
@@ -68,7 +50,7 @@ Recompile it to C (output goes to the git-ignored `data/generated/` and is picke
 see [docs/decompilation.md](docs/decompilation.md)):
 
 ```
-psprecomp data/original/PSP_GAME/SYSDIR/BOOT.BIN data/generated --overrides src/decomp --seeds seeds.txt
+build/linux-x64-debug/psprecore/tools/psprecomp/psprecomp data/original/PSP_GAME/SYSDIR/BOOT.BIN data/generated --overrides src/decomp --seeds seeds.txt
 ```
 
 Cook the movie media the game loads besides the disc (PSMF video becomes AV1/IVF and its ATRAC3plus audio
@@ -87,7 +69,7 @@ scripts/run.sh                              # the repository's layout (run/ as c
 scripts/run.sh -- --replay ../data/recordings/boot.txt --unthrottled
 ```
 
-Or invoke the binary directly: `jdarc data/original --cooked data/cooked`.
+Or invoke the binary directly: `build/linux-x64-release/jdarc data/original --cooked data/cooked`.
 
 Android: `scripts/build-android.sh --install` builds and installs the APK (arm64, NDK r29);
 `--install-data` copies the game and `data/cooked` to the device. Logs go to logcat (tag `jdarc`).
