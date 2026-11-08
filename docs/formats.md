@@ -35,8 +35,7 @@ scripts that produced these notes live in `tools/analysis/` (throwaway, game-spe
   cooked media (`movies/<fnv1a64-of-2048-byte-header>.ivf` + `.ogg`). Missing tracks are reported as
   `sceMpeg: no cooked movie ... showing black` or `sceMpeg: no cooked audio ... silent`. `jdcook` demuxes
   the H.264 and private-stream ATRAC3plus itself (FFmpeg does not detect the latter in these PMF files),
-  then converts them with SVT-AV1 and Vorbis:
-  `build/linux-x64-debug/tools/jdcook/jdcook data/original data/cooked`.
+  then converts them with SVT-AV1 and Vorbis (`scripts/cook.sh`).
   The player covers the game's direct-sceMpeg path including the YCbCr/Csc presentation used for
   cutscenes (`AvcInitYCbCr`/`AvcDecodeYCbCr`/`AvcDecodeStopYCbCr(mpeg, buffer, status*)`/`AvcCsc`,
   `QueryStreamSize`, `scePsmfSetPsmf/GetVideoInfo` — PPSSPP-faithful signatures; the Stop form takes no

@@ -52,12 +52,12 @@ build/linux-x64-debug/psprecore/tools/psprecomp/psprecomp data/original/PSP_GAME
 ```
 
 Cook the movie media the game loads besides the disc (PSMF video becomes AV1/IVF and its ATRAC3plus audio
-becomes Ogg). This needs FFmpeg with the SVT-AV1 and Vorbis encoders. Missing audio is silent and missing
-video is black. Existing outputs are kept, so an interrupted cooking run can be resumed:
+becomes Ogg). This needs FFmpeg with the SVT-AV1 and Vorbis encoders:
 
 ```
-cmake --build --preset linux-x64-debug --target jdcook
-build/linux-x64-debug/tools/jdcook/jdcook data/original data/cooked
+scripts/cook.sh                              # data/original -> data/cooked
+scripts/cook.sh -- --force --limit 1         # re-cook, or trial-run the first movie
+scripts\cook.ps1                             # Windows
 ```
 
 Run the game (settings, saves: the working directory):
