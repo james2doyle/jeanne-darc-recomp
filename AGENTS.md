@@ -32,11 +32,17 @@ Run only the game-format test executable with:
 ctest --preset linux-x64-debug -R '^jdarc_game_tests$' --output-on-failure
 ```
 
+Prefer the wrapper scripts (Linux `.sh`, Windows `.ps1`, same options as flags): `scripts/build.sh`
+(configure/build/test), `scripts/run.sh` (play with the repo layout), `scripts/regress.sh`
+(state-hash regression over `data/recordings`), `scripts/pictures.sh` and
+`scripts/smooth-check.sh` (draw comparisons; placeholder runs), `scripts/build-android.sh`
+(APK build, device deploy, smoke test), `scripts/ghidra_import.sh` (Ghidra project for BOOT.BIN).
+
 CTest exposes two executables, `psprecore_tests` and `jdarc_game_tests`; their custom runner has no individual-case filter. Neither suite needs game data. There is no repository-wide formatter or lint configuration, so build and CTest are the normal verification steps.
 
 - The `jdarc` target exists only if `data/generated/funcs.h` existed at CMake configure time. Configure with `-DPSPRECORE_BUILD_GAME=OFF` to build tools, formats, and tests without the Vulkan frontend or generated game code.
 - On Windows, `scripts\build.ps1` imports the Visual Studio x64 environment and locates LLVM/CMake/Ninja; use its `-Preset`, `-Target`, and `-NoTest` parameters instead of manually reproducing that setup.
-- For Android, use `scripts\build-android.ps1` rather than invoking Gradle alone. Gradle requires the CMake-produced native libraries; the script expects NDK `29.0.14206865`, JDK 17+, and the Vulkan SDK. `-Install -Smoke` installs and performs a short device boot check.
+- For Android, use `scripts\build-android.ps1` rather than invoking Gradle alone. Gradle requires the CMake-produced native libraries; the script expects NDK `29.0.14206865`, JDK 17 or 21 (auto-selected; JDK 22+ breaks the build), and the Vulkan SDK. `-Install -Smoke` installs and performs a short device boot check.
 
 ## Generated code and decompilation
 
@@ -52,26 +58,26 @@ build/linux-x64-debug/psprecore/tools/psprecomp/psprecomp \
 
 Build the `psprecomp` target first if that binary is missing. Re-run `cmake --preset linux-x64-debug` after the **first** generation so the `jdarc` target is created. CMake does not regenerate automatically; if `funcs.h` predates a replacement, it warns and omits all overrides from that build.
 
-For raw `sce_lbn` disc reads, create the extracted disc's map with `python3 tools/analysis/lbn.py game.iso data/original/lbn.tsv`; otherwise those reads fail even though ordinary file loads work. `tools/analysis/bootstrap_seeds.py` automates missing-callback discovery but is hardcoded to `linux-x64-debug` and appends to `seeds.txt`; verify reported addresses are actually code before accepting them.
+For raw `sce_lbn` disc reads, create the extracted disc's map with `python3 tools/analysis/lbn.py game.iso data/original/lbn.tsv`; otherwise those reads fail even though ordinary file loads work. `tools/analysis/bootstrap_seeds.py` automates missing-callback discovery but is hardcoded to `linux-x64-debug` and appends to `seeds.txt`; verify reported addresses are actually code before accepting them. `scripts/ghidra_import.sh` builds the BOOT.BIN Ghidra project (needs a debug build and `data/nids.tsv`).
 
 ## Runtime and behavioral checks
 
 Use `run/` as the working directory when settings/save isolation matters, and pass both media roots:
 
 ```sh
-mkdir -p run
-(cd run && ../build/linux-x64-debug/jdarc ../data/original --cooked ../data/cooked)
+scripts/run.sh                              # play with the repo layout (run/ as cwd)
+scripts/run.sh -- --replay ../data/recordings/boot.txt --unthrottled
 ```
 
 Missing cooked media is a supported degraded state: movies are black and cooked audio is silent. Do not treat that alone as a rendering/audio regression.
 
 State regression tests use local recordings and require the same cooked media used to make their references:
 
-```powershell
-scripts\regress.ps1                 # compare recordings that have .state files
-scripts\regress.ps1 -Update         # overwrite references from the current build
+```sh
+scripts/regress.sh                 # compare recordings that have .state files
+scripts/regress.sh --update        # overwrite references from the current build
 ```
 
-Use before/after state hashes for behavior-preserving decompilation work. `scripts/pictures.ps1` and `scripts/smooth-check.ps1` currently contain placeholder run definitions, so configure their recordings/vblank ranges before relying on them.
+Use before/after state hashes for behavior-preserving decompilation work. `scripts/pictures.sh` and `scripts/smooth-check.sh` (`.ps1` on Windows) currently contain placeholder run definitions, so configure their recordings/vblank ranges before relying on them. `scripts/regress.sh` replays `data/recordings` (see [docs/testing.md](docs/testing.md)).
 
-IMPORTANT: Prefer retrieval-led reasoning over pre-training-led reasoning for psprecore and PSP reverse-engineering tasks. Consult `docs/decompilation.md`, `docs/formats.md`, `psprecore/docs/recompiler.md`, and the relevant runtime implementation instead of guessing format or ABI behavior.
+IMPORTANT: Prefer retrieval-led reasoning over pre-training-led reasoning for psprecore and PSP reverse-engineering tasks. Consult `docs/decompilation.md`, `docs/formats.md`, `docs/tools.md`, `docs/testing.md`, `docs/decisions.md`, `psprecore/docs/recompiler.md`, and the relevant runtime implementation instead of guessing format or ABI behavior.
